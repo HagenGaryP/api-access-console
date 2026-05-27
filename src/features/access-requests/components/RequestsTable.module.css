@@ -1,0 +1,144 @@
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.85rem 1rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table th {
+  color: #4b5563;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.table td {
+  color: #111827;
+  font-size: 0.9rem;
+}
+
+.requesterBlock {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.requesterName {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.requesterEmail {
+  color: #6b7280;
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.emptyState {
+  color: #6b7280;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.mobileCards {
+  display: none;
+}
+
+.mobileCard {
+  min-width: 0;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.8rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.mobileCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+}
+
+.mobileDetails {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.mobileDetailRow {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.mobileDetailRow dt {
+  color: #6b7280;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.mobileDetailRow dd {
+  color: #111827;
+  font-size: 0.92rem;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.mobileEmptyState {
+  color: #6b7280;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.8rem;
+}
+
+@media (max-width: 639px) {
+  .tableContainer {
+    display: none;
+  }
+
+  .mobileCards {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .requesterEmail {
+    font-size: 0.75rem;
+  }
+}
