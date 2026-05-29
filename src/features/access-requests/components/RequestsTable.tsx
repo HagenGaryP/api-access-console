@@ -4,6 +4,7 @@ import styles from "./RequestsTable.module.css";
 
 type RequestsTableProps = {
   requests: readonly AccessRequest[];
+  emptyMessage?: string;
 };
 
 const submittedDateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -20,7 +21,10 @@ function formatSubmittedDate(submittedAt: string): string {
   return submittedDateFormatter.format(date);
 }
 
-export function RequestsTable({ requests }: RequestsTableProps) {
+export function RequestsTable({
+  requests,
+  emptyMessage = "No access requests found.",
+}: RequestsTableProps) {
   return (
     <>
       <div className={styles.tableContainer}>
@@ -44,7 +48,7 @@ export function RequestsTable({ requests }: RequestsTableProps) {
             {requests.length === 0 ? (
               <tr>
                 <td colSpan={7} className={styles.emptyState}>
-                  No access requests found.
+                  {emptyMessage}
                 </td>
               </tr>
             ) : (
@@ -81,7 +85,7 @@ export function RequestsTable({ requests }: RequestsTableProps) {
 
       <div className={styles.mobileCards} aria-label="Access requests">
         {requests.length === 0 ? (
-          <p className={styles.mobileEmptyState}>No access requests found.</p>
+          <p className={styles.mobileEmptyState}>{emptyMessage}</p>
         ) : (
           requests.map((request) => (
             <article key={request.id} className={styles.mobileCard}>

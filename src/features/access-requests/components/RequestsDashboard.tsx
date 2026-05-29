@@ -1,12 +1,60 @@
-import type { AccessRequest } from "../types";
+"use client";
+
+import { useState } from "react";
+import type { AccessRequest, AccessStatus, Environment } from "../types";
 import { RequestsTable } from "./RequestsTable";
+import { RequestsToolbar } from "./RequestsToolbar";
+import type { SortOrder } from "./RequestsToolbar";
 import styles from "./RequestsDashboard.module.css";
 
 type RequestsDashboardProps = {
   requests: readonly AccessRequest[];
 };
 
+function matchesSearch(request: AccessRequest, query: string): boolean {
+  const q = query.toLowerCase();
+  return (
+    request.requesterName.toLowerCase().includes(q) ||
+    request.requesterEmail.toLowerCase().includes(q) ||
+    request.team.toLowerCase().includes(q) ||
+    request.apiName.toLowerCase().includes(q)
+  );
+}
+
 export function RequestsDashboard({ requests }: RequestsDashboardProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<AccessStatus | "">("");
+  const [environmentFilter, setEnvironmentFilter] = useState<Environment | "">(
+    ""
+  );
+  const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
+
+  const trimmedSearch = searchQuery.trim();
+  const normalizedSearch = trimmedSearch.toLowerCase();
+  const hasActiveFilters =
+    trimmedSearch !== "" || statusFilter !== "" || environmentFilter !== "";
+
+  const filteredRequests = requests
+    .filter((r) => {
+      if (statusFilter !== "" && r.status !== statusFilter) return false;
+      if (environmentFilter !== "" && r.environment !== environmentFilter)
+        return false;
+      if (normalizedSearch !== "" && !matchesSearch(r, normalizedSearch))
+        return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const diff = Date.parse(a.submittedAt) - Date.parse(b.submittedAt);
+      return sortOrder === "newest" ? -diff : diff;
+    });
+
+  function clearFilters() {
+    setSearchQuery("");
+    setStatusFilter("");
+    setEnvironmentFilter("");
+    setSortOrder("newest");
+  }
+
   return (
     <main className={styles.page}>
       <header className={styles.header}>
@@ -16,13 +64,45 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
         </p>
       </header>
 
+      <RequestsToolbar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        statusFilter={statusFilter}
+        onStatusChange={setStatusFilter}
+        environmentFilter={environmentFilter}
+        onEnvironmentChange={setEnvironmentFilter}
+        sortOrder={sortOrder}
+        onSortChange={setSortOrder}
+      />
+
+      {hasActiveFilters && (
+        <div className={styles.toolbarActions}>
+          <button
+            type="button"
+            className={styles.clearFilters}
+            onClick={clearFilters}
+          >
+            Clear filters
+          </button>
+        </div>
+      )}
+
       <section className={styles.summary} aria-label="Request summary">
-        <p className={styles.summaryLabel}>Total requests</p>
-        <p className={styles.summaryValue}>{requests.length}</p>
+        <p className={styles.summaryLabel}>Showing</p>
+        <p className={styles.summaryValue}>
+          {filteredRequests.length} of {requests.length} requests
+        </p>
       </section>
 
       <section className={styles.tableCard} aria-label="Access request table">
-        <RequestsTable requests={requests} />
+        <RequestsTable
+          requests={filteredRequests}
+          emptyMessage={
+            hasActiveFilters
+              ? "No requests match your current filters."
+              : "No access requests found."
+          }
+        />
       </section>
     </main>
   );
