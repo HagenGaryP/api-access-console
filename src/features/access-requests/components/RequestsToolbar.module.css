@@ -19,7 +19,7 @@
 }
 
 .label {
-  color: #4b5563;
+  color: var(--color-text-secondary);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -28,37 +28,37 @@
 
 .input {
   width: 100%;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border);
   border-radius: 0.4rem;
   padding: 0.45rem 0.6rem;
   font-size: 0.875rem;
   font-family: inherit;
-  color: #111827;
-  background-color: #ffffff;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
   height: 2.25rem;
 }
 
 .input:focus {
-  outline: 2px solid #2563eb;
+  outline: 2px solid var(--color-accent);
   outline-offset: 1px;
-  border-color: #2563eb;
+  border-color: var(--color-accent);
 }
 
 .select {
   min-width: 140px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border);
   border-radius: 0.4rem;
   padding: 0.45rem 0.6rem;
   font-size: 0.875rem;
   font-family: inherit;
-  color: #111827;
-  background-color: #ffffff;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
   cursor: pointer;
   height: 2.25rem;
 }
 
 .select:focus {
-  outline: 2px solid #2563eb;
+  outline: 2px solid var(--color-accent);
   outline-offset: 1px;
-  border-color: #2563eb;
+  border-color: var(--color-accent);
 }

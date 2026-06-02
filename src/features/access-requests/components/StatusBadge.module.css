@@ -10,16 +10,16 @@
 }
 
 .pending {
-  background-color: #fff3d6;
-  color: #8a5a00;
+  background-color: var(--color-badge-pending-bg);
+  color: var(--color-badge-pending-text);
 }
 
 .approved {
-  background-color: #daf4e4;
-  color: #18623d;
+  background-color: var(--color-badge-approved-bg);
+  color: var(--color-badge-approved-text);
 }
 
 .rejected {
-  background-color: #fde2e2;
-  color: #8a1f1f;
+  background-color: var(--color-badge-rejected-bg);
+  color: var(--color-badge-rejected-text);
 }
