@@ -18,6 +18,7 @@ Build a polished internal tool for reviewing API access requests.
 - Do not add a database
 - Do not turn this into a full-stack production system
 - Do not add dependencies unless explicitly requested
+- If replacing a missing dependency would require more than ~10 lines of non-trivial inline code, stop and ask the developer before proceeding
 - Do not implement more than the requested issue or scope
 
 ## Architecture guidance
@@ -52,7 +53,7 @@ Build a polished internal tool for reviewing API access requests.
 
 ## Data and validation guidance
 - Prefer small, readable validators over heavy validation systems unless explicitly requested
-- Keep mocked data realistic, compact, and easy to understand
+- Keep mocked data to 5–10 records maximum, using flat structures unless nesting is required by the feature
 - Return safe copies from mock read helpers when exposing module-level records
 
 ## Comments and documentation
@@ -63,7 +64,8 @@ Build a polished internal tool for reviewing API access requests.
 
 ## Workflow guidance
 - First state which files you plan to modify
-- Make the smallest reasonable set of changes
+- If the developer objects to the file plan, revise the plan before writing any code. Do not begin implementation until the plan is accepted or the developer explicitly says to proceed
+- Change only the files listed in your upfront plan. If an unlisted file must change, state why before editing it
 - Do not modify unrelated files
 - Stop when the requested slice is complete
 - Before declaring work complete, assume the developer should run:
@@ -72,7 +74,9 @@ Build a polished internal tool for reviewing API access requests.
   - `pnpm build`
 
 ## When unsure
-- Choose the simpler implementation
-- Choose the more readable implementation
-- Choose the more type-safe implementation
-- Choose the implementation with the fewest moving parts
+- Prefer, in this order:
+  1. the most type-safe implementation
+  2. the most readable implementation
+  3. the simplest implementation
+  4. the implementation with the fewest moving parts
+- If two options tie on all four, choose the one requiring fewer new files
