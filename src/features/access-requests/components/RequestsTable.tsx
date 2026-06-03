@@ -5,6 +5,8 @@ import styles from "./RequestsTable.module.css";
 type RequestsTableProps = {
   requests: readonly AccessRequest[];
   emptyMessage?: string;
+  selectedRequestId?: string | null;
+  onSelectRequest?: (id: string) => void;
 };
 
 const submittedDateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -24,6 +26,8 @@ function formatSubmittedDate(submittedAt: string): string {
 export function RequestsTable({
   requests,
   emptyMessage = "No access requests found.",
+  selectedRequestId,
+  onSelectRequest,
 }: RequestsTableProps) {
   return (
     <>
@@ -42,18 +46,33 @@ export function RequestsTable({
               <th scope="col">Access</th>
               <th scope="col">Submitted</th>
               <th scope="col">Status</th>
+              {onSelectRequest !== undefined && (
+                <th scope="col" className={styles.visuallyHidden}>
+                  Details
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
             {requests.length === 0 ? (
               <tr>
-                <td colSpan={7} className={styles.emptyState}>
+                <td
+                  colSpan={onSelectRequest !== undefined ? 8 : 7}
+                  className={styles.emptyState}
+                >
                   {emptyMessage}
                 </td>
               </tr>
             ) : (
               requests.map((request) => (
-                <tr key={request.id}>
+                <tr
+                  key={request.id}
+                  className={
+                    request.id === selectedRequestId
+                      ? styles.rowSelected
+                      : undefined
+                  }
+                >
                   <td>
                     <div className={styles.requesterBlock}>
                       <span className={styles.requesterName}>
@@ -76,6 +95,22 @@ export function RequestsTable({
                   <td>
                     <StatusBadge status={request.status} />
                   </td>
+                  {onSelectRequest !== undefined && (
+                    <td className={styles.actionCell}>
+                      <button
+                        type="button"
+                        className={
+                          request.id === selectedRequestId
+                            ? `${styles.viewButton} ${styles.viewButtonActive}`
+                            : styles.viewButton
+                        }
+                        onClick={() => onSelectRequest(request.id)}
+                        aria-label={`View details for ${request.requesterName}`}
+                      >
+                        View
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))
             )}
@@ -88,7 +123,14 @@ export function RequestsTable({
           <p className={styles.mobileEmptyState}>{emptyMessage}</p>
         ) : (
           requests.map((request) => (
-            <article key={request.id} className={styles.mobileCard}>
+            <article
+              key={request.id}
+              className={
+                request.id === selectedRequestId
+                  ? `${styles.mobileCard} ${styles.mobileCardSelected}`
+                  : styles.mobileCard
+              }
+            >
               <div className={styles.mobileCardHeader}>
                 <div className={styles.requesterBlock}>
                   <span className={styles.requesterName}>
@@ -127,6 +169,16 @@ export function RequestsTable({
                   </dd>
                 </div>
               </dl>
+              {onSelectRequest !== undefined && (
+                <button
+                  type="button"
+                  className={styles.mobileViewButton}
+                  onClick={() => onSelectRequest(request.id)}
+                  aria-label={`View details for ${request.requesterName}`}
+                >
+                  View details
+                </button>
+              )}
             </article>
           ))
         )}

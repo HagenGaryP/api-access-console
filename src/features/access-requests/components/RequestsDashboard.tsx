@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { AccessRequest, AccessStatus, Environment } from "../types";
 import { RequestsTable } from "./RequestsTable";
 import { RequestsToolbar } from "./RequestsToolbar";
+import { RequestDetailPanel } from "./RequestDetailPanel";
 import type { SortOrder } from "./RequestsToolbar";
 import styles from "./RequestsDashboard.module.css";
 
@@ -28,6 +29,7 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
     ""
   );
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
   const trimmedSearch = searchQuery.trim();
   const normalizedSearch = trimmedSearch.toLowerCase();
@@ -48,6 +50,12 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
       return sortOrder === "newest" ? -diff : diff;
     });
 
+  // Derived from the full list so the panel stays open when filters change.
+  const selectedRequest =
+    selectedRequestId !== null
+      ? (requests.find((r) => r.id === selectedRequestId) ?? null)
+      : null;
+
   function clearFilters() {
     setSearchQuery("");
     setStatusFilter("");
@@ -56,6 +64,7 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
   }
 
   return (
+    <>
     <main className={styles.page}>
       <header className={styles.header}>
         <h1 className={styles.title}>API Access Requests</h1>
@@ -97,6 +106,8 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
       <section className={styles.tableCard} aria-label="Access request table">
         <RequestsTable
           requests={filteredRequests}
+          selectedRequestId={selectedRequestId}
+          onSelectRequest={setSelectedRequestId}
           emptyMessage={
             hasActiveFilters
               ? "No requests match your current filters."
@@ -105,5 +116,11 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
         />
       </section>
     </main>
+
+    <RequestDetailPanel
+      request={selectedRequest}
+      onClose={() => setSelectedRequestId(null)}
+    />
+    </>
   );
 }

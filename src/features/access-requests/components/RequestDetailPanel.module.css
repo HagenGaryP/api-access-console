@@ -1,0 +1,135 @@
+.panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  box-shadow: -2px 0 8px rgba(15, 23, 42, 0.08);
+  z-index: 110;
+}
+
+.panelHeader {
+  position: sticky;
+  top: 0;
+  z-index: 111;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.25rem 1rem;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.panelTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.closeButton {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0.2rem 0.45rem;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  font-family: inherit;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 0.3rem;
+}
+
+.closeButton:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-border-subtle);
+}
+
+.closeButton:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.panelBody {
+  flex: 1;
+  padding-bottom: 2rem;
+}
+
+.section {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.sectionHeading {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.65rem;
+}
+
+.detailList {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.detailRow {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.detailLabel {
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+}
+
+.detailValue {
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.bodyText {
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.emailLink {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.emailLink:hover {
+  text-decoration: underline;
+}
+
+/* Narrow/mobile: full-screen overlay */
+@media (max-width: 899px) {
+  .panel {
+    inset: 0;
+    width: 100%;
+    border-left: none;
+    box-shadow: none;
+  }
+}
