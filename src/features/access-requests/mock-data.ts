@@ -1,4 +1,5 @@
 import type { AccessRequest } from "./types";
+import { AccessStatus } from "./types";
 import { assertMockDataValid } from "./schema";
 
 const SIMULATED_LATENCY_MS = 400;
@@ -9,6 +10,15 @@ let simulateError = false;
 export function setSimulateError(value: boolean): void {
   simulateError = value;
 }
+
+/** Mock reviewer identity used for all decisions made in this app. */
+const MOCK_REVIEWER_EMAIL = "reviewer@company.com";
+
+export type DecisionAction = "approve" | "reject";
+
+export type SubmitDecisionResult =
+  | { ok: true; request: AccessRequest }
+  | { ok: false; error: string };
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -25,9 +35,13 @@ const mockAccessRequests: ReadonlyArray<AccessRequest> = [
     accessLevel: "read",
     status: "approved",
     submittedAt: "2026-03-10T09:15:00.000Z",
-    justification: "Need read access to reconcile transaction records for quarterly audit.",
+    justification:
+      "Need read access to reconcile transaction records for quarterly audit.",
     reviewerNotes: "Standard audit access. Approved.",
-    decision: { reviewedBy: "bob.smith@company.com", reviewedAt: "2026-03-11T14:00:00.000Z" },
+    decision: {
+      reviewedBy: "bob.smith@company.com",
+      reviewedAt: "2026-03-11T14:00:00.000Z",
+    },
   },
   {
     id: "req_002",
@@ -53,8 +67,12 @@ const mockAccessRequests: ReadonlyArray<AccessRequest> = [
     status: "rejected",
     submittedAt: "2026-03-20T08:45:00.000Z",
     justification: "Exploratory analysis for a churn prediction model.",
-    reviewerNotes: "PII exposure risk in production. Please request access to the anonymized staging dataset instead.",
-    decision: { reviewedBy: "carol.james@company.com", reviewedAt: "2026-03-21T10:20:00.000Z" },
+    reviewerNotes:
+      "PII exposure risk in production. Please request access to the anonymized staging dataset instead.",
+    decision: {
+      reviewedBy: "carol.james@company.com",
+      reviewedAt: "2026-03-21T10:20:00.000Z",
+    },
   },
   {
     id: "req_004",
@@ -66,9 +84,13 @@ const mockAccessRequests: ReadonlyArray<AccessRequest> = [
     accessLevel: "write",
     status: "approved",
     submittedAt: "2026-04-05T13:00:00.000Z",
-    justification: "Building the in-app notification feature for the v4.2 release.",
+    justification:
+      "Building the in-app notification feature for the v4.2 release.",
     reviewerNotes: "Dev environment only. Approved for sprint duration.",
-    decision: { reviewedBy: "bob.smith@company.com", reviewedAt: "2026-04-05T16:45:00.000Z" },
+    decision: {
+      reviewedBy: "bob.smith@company.com",
+      reviewedAt: "2026-04-05T16:45:00.000Z",
+    },
   },
   {
     id: "req_005",
@@ -93,8 +115,12 @@ const mockAccessRequests: ReadonlyArray<AccessRequest> = [
     accessLevel: "read",
     status: "approved",
     submittedAt: "2026-02-14T07:30:00.000Z",
-    justification: "Ongoing SOC 2 compliance monitoring. Security team requires persistent read access.",
-    decision: { reviewedBy: "carol.james@company.com", reviewedAt: "2026-02-14T09:00:00.000Z" },
+    justification:
+      "Ongoing SOC 2 compliance monitoring. Security team requires persistent read access.",
+    decision: {
+      reviewedBy: "carol.james@company.com",
+      reviewedAt: "2026-02-14T09:00:00.000Z",
+    },
   },
   {
     id: "req_007",
@@ -106,7 +132,8 @@ const mockAccessRequests: ReadonlyArray<AccessRequest> = [
     accessLevel: "read",
     status: "pending",
     submittedAt: "2026-04-22T14:20:00.000Z",
-    justification: "A/B test analysis for the onboarding redesign experiment launching next sprint.",
+    justification:
+      "A/B test analysis for the onboarding redesign experiment launching next sprint.",
   },
   {
     id: "req_008",
@@ -120,8 +147,12 @@ const mockAccessRequests: ReadonlyArray<AccessRequest> = [
     submittedAt: "2026-04-10T09:00:00.000Z",
     justification:
       "Need admin access to deregister deprecated service instances as part of the microservice consolidation project.",
-    reviewerNotes: "Too broad. Please scope this to a write-level request with specific service IDs listed.",
-    decision: { reviewedBy: "carol.james@company.com", reviewedAt: "2026-04-11T11:30:00.000Z" },
+    reviewerNotes:
+      "Too broad. Please scope this to a write-level request with specific service IDs listed.",
+    decision: {
+      reviewedBy: "carol.james@company.com",
+      reviewedAt: "2026-04-11T11:30:00.000Z",
+    },
   },
   {
     id: "req_009",
@@ -133,8 +164,12 @@ const mockAccessRequests: ReadonlyArray<AccessRequest> = [
     accessLevel: "read",
     status: "approved",
     submittedAt: "2026-03-28T12:00:00.000Z",
-    justification: "Training a cost-anomaly detection model that needs historical metric data.",
-    decision: { reviewedBy: "bob.smith@company.com", reviewedAt: "2026-03-29T08:15:00.000Z" },
+    justification:
+      "Training a cost-anomaly detection model that needs historical metric data.",
+    decision: {
+      reviewedBy: "bob.smith@company.com",
+      reviewedAt: "2026-03-29T08:15:00.000Z",
+    },
   },
   {
     id: "req_010",
@@ -146,7 +181,8 @@ const mockAccessRequests: ReadonlyArray<AccessRequest> = [
     accessLevel: "write",
     status: "pending",
     submittedAt: "2026-04-23T16:50:00.000Z",
-    justification: "Implementing profile edit flow for the mobile app redesign.",
+    justification:
+      "Implementing profile edit flow for the mobile app redesign.",
   },
 ];
 
@@ -165,7 +201,7 @@ export async function fetchAccessRequests(): Promise<AccessRequest[]> {
 }
 
 export async function fetchAccessRequestById(
-  id: string
+  id: string,
 ): Promise<AccessRequest | undefined> {
   await sleep(SIMULATED_LATENCY_MS);
   if (simulateError) {
@@ -173,4 +209,46 @@ export async function fetchAccessRequestById(
   }
   const found = mockAccessRequests.find((r) => r.id === id);
   return found ? cloneAccessRequest(found) : undefined;
+}
+
+/**
+ * Simulates approving or rejecting a request. Does not mutate the
+ * module-level mock dataset — callers own the resulting record.
+ */
+export async function submitDecision(
+  id: string,
+  action: DecisionAction,
+): Promise<SubmitDecisionResult> {
+  await sleep(SIMULATED_LATENCY_MS);
+
+  if (simulateError) {
+    return {
+      ok: false,
+      error: `[mock] Failed to submit decision for request ${id}.`,
+    };
+  }
+
+  const found = mockAccessRequests.find((r) => r.id === id);
+  if (found === undefined) {
+    return { ok: false, error: `[mock] Request ${id} not found.` };
+  }
+
+  if (found.status !== AccessStatus.pending) {
+    return {
+      ok: false,
+      error: `[mock] Only pending requests can be approved or rejected.`,
+    };
+  }
+
+  const updated: AccessRequest = {
+    ...cloneAccessRequest(found),
+    status:
+      action === "approve" ? AccessStatus.approved : AccessStatus.rejected,
+    decision: {
+      reviewedBy: MOCK_REVIEWER_EMAIL,
+      reviewedAt: new Date().toISOString(),
+    },
+  };
+
+  return { ok: true, request: updated };
 }
