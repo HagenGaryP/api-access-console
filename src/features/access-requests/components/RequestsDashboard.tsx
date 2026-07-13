@@ -23,6 +23,11 @@ function matchesSearch(request: AccessRequest, query: string): boolean {
 }
 
 export function RequestsDashboard({ requests }: RequestsDashboardProps) {
+  // Session-local copy of the server-provided requests. Decisions update
+  // this list; the `requests` prop itself is never mutated.
+  const [localRequests, setLocalRequests] = useState<AccessRequest[]>(() => [
+    ...requests,
+  ]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<AccessStatus | "">("");
   const [environmentFilter, setEnvironmentFilter] = useState<Environment | "">(
@@ -36,7 +41,7 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
   const hasActiveFilters =
     trimmedSearch !== "" || statusFilter !== "" || environmentFilter !== "";
 
-  const filteredRequests = requests
+  const filteredRequests = localRequests
     .filter((r) => {
       if (statusFilter !== "" && r.status !== statusFilter) return false;
       if (environmentFilter !== "" && r.environment !== environmentFilter)
@@ -50,10 +55,12 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
       return sortOrder === "newest" ? -diff : diff;
     });
 
-  // Derived from the full list so the panel stays open when filters change.
+  // Derived from the full local list (not the filtered one) so the panel
+  // stays open even if filters change or the selected request's status
+  // no longer matches the active filters.
   const selectedRequest =
     selectedRequestId !== null
-      ? (requests.find((r) => r.id === selectedRequestId) ?? null)
+      ? (localRequests.find((r) => r.id === selectedRequestId) ?? null)
       : null;
 
   function clearFilters() {
@@ -63,64 +70,73 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
     setSortOrder("newest");
   }
 
+  function handleDecision(updatedRequest: AccessRequest) {
+    setLocalRequests((prev) =>
+      prev.map((r) => (r.id === updatedRequest.id ? updatedRequest : r))
+    );
+  }
+
+
   return (
     <>
-    <main className={styles.page}>
-      <header className={styles.header}>
-        <h1 className={styles.title}>API Access Requests</h1>
-        <p className={styles.description}>
-          Review current requests across teams and environments.
-        </p>
-      </header>
+      <main className={styles.page}>
+        <header className={styles.header}>
+          <h1 className={styles.title}>API Access Requests</h1>
+          <p className={styles.description}>
+            Review current requests across teams and environments.
+          </p>
+        </header>
 
-      <RequestsToolbar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        statusFilter={statusFilter}
-        onStatusChange={setStatusFilter}
-        environmentFilter={environmentFilter}
-        onEnvironmentChange={setEnvironmentFilter}
-        sortOrder={sortOrder}
-        onSortChange={setSortOrder}
-      />
-
-      {hasActiveFilters && (
-        <div className={styles.toolbarActions}>
-          <button
-            type="button"
-            className={styles.clearFilters}
-            onClick={clearFilters}
-          >
-            Clear filters
-          </button>
-        </div>
-      )}
-
-      <section className={styles.summary} aria-label="Request summary">
-        <p className={styles.summaryLabel}>Showing</p>
-        <p className={styles.summaryValue}>
-          {filteredRequests.length} of {requests.length} requests
-        </p>
-      </section>
-
-      <section className={styles.tableCard} aria-label="Access request table">
-        <RequestsTable
-          requests={filteredRequests}
-          selectedRequestId={selectedRequestId}
-          onSelectRequest={setSelectedRequestId}
-          emptyMessage={
-            hasActiveFilters
-              ? "No requests match your current filters."
-              : "No access requests found."
-          }
+        <RequestsToolbar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          statusFilter={statusFilter}
+          onStatusChange={setStatusFilter}
+          environmentFilter={environmentFilter}
+          onEnvironmentChange={setEnvironmentFilter}
+          sortOrder={sortOrder}
+          onSortChange={setSortOrder}
         />
-      </section>
-    </main>
 
-    <RequestDetailPanel
-      request={selectedRequest}
-      onClose={() => setSelectedRequestId(null)}
-    />
+        {hasActiveFilters && (
+          <div className={styles.toolbarActions}>
+            <button
+              type="button"
+              className={styles.clearFilters}
+              onClick={clearFilters}
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
+
+        <section className={styles.summary} aria-label="Request summary">
+          <p className={styles.summaryLabel}>Showing</p>
+          <p className={styles.summaryValue}>
+            {filteredRequests.length} of {localRequests.length} requests
+          </p>
+        </section>
+
+        <section className={styles.tableCard} aria-label="Access request table">
+          <RequestsTable
+            requests={filteredRequests}
+            selectedRequestId={selectedRequestId}
+            onSelectRequest={setSelectedRequestId}
+            emptyMessage={
+              hasActiveFilters
+                ? "No requests match your current filters."
+                : "No access requests found."
+            }
+          />
+        </section>
+      </main>
+
+      <RequestDetailPanel
+        key={selectedRequestId ?? "no-selection"}
+        request={selectedRequest}
+        onClose={() => setSelectedRequestId(null)}
+        onDecision={handleDecision}
+      />
     </>
   );
 }

@@ -124,6 +124,64 @@
   text-decoration: underline;
 }
 
+.actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.actionButton {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.4rem;
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.actionButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.actionButton:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.approveButton {
+  background-color: var(--color-badge-approved-bg);
+  color: var(--color-badge-approved-text);
+  border-color: var(--color-badge-approved-text);
+}
+
+.approveButton:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+
+.rejectButton {
+  background-color: var(--color-badge-rejected-bg);
+  color: var(--color-badge-rejected-text);
+  border-color: var(--color-badge-rejected-text);
+}
+
+.rejectButton:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+
+.successMessage {
+  margin-top: 0.65rem;
+  font-size: 0.85rem;
+  color: var(--color-badge-approved-text);
+}
+
+.errorMessage {
+  margin-top: 0.65rem;
+  font-size: 0.85rem;
+  color: var(--color-badge-rejected-text);
+}
+
 /* Narrow/mobile: full-screen overlay */
 @media (max-width: 899px) {
   .panel {
