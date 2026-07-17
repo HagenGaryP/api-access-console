@@ -55,6 +55,12 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
       return sortOrder === "newest" ? -diff : diff;
     });
 
+  // No requests exist at all versus the active search/filters simply not
+  // matching anything — these are distinct empty states with different
+  // messaging.
+  const hasNoData = localRequests.length === 0;
+  const hasNoResults = filteredRequests.length === 0;
+
   // Derived from the full local list (not the filtered one) so the panel
   // stays open even if filters change or the selected request's status
   // no longer matches the active filters.
@@ -98,7 +104,7 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
           onSortChange={setSortOrder}
         />
 
-        {hasActiveFilters && (
+        {hasActiveFilters && !hasNoResults && (
           <div className={styles.toolbarActions}>
             <button
               type="button"
@@ -117,18 +123,46 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
           </p>
         </section>
 
-        <section className={styles.tableCard} aria-label="Access request table">
-          <RequestsTable
-            requests={filteredRequests}
-            selectedRequestId={selectedRequestId}
-            onSelectRequest={setSelectedRequestId}
-            emptyMessage={
-              hasActiveFilters
-                ? "No requests match your current filters."
-                : "No access requests found."
-            }
-          />
-        </section>
+        {hasNoResults ? (
+          <section className={styles.emptyState} aria-label="Access request results">
+            {hasNoData ? (
+              <>
+                <h2 className={styles.emptyStateTitle}>
+                  No access requests yet
+                </h2>
+                <p className={styles.emptyStateText}>
+                  Submitted access requests will appear here once teams
+                  start requesting API access.
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className={styles.emptyStateTitle}>
+                  No matching requests
+                </h2>
+                <p className={styles.emptyStateText}>
+                  Try adjusting your search or filters to find what you’re
+                  looking for.
+                </p>
+                <button
+                  type="button"
+                  className={styles.clearFilters}
+                  onClick={clearFilters}
+                >
+                  Clear filters
+                </button>
+              </>
+            )}
+          </section>
+        ) : (
+          <section className={styles.tableCard} aria-label="Access request table">
+            <RequestsTable
+              requests={filteredRequests}
+              selectedRequestId={selectedRequestId}
+              onSelectRequest={setSelectedRequestId}
+            />
+          </section>
+        )}
       </main>
 
       <RequestDetailPanel

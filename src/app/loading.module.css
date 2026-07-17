@@ -1,0 +1,236 @@
+.page {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1120px;
+  padding: 2.5rem 1.25rem 3rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skeleton {
+  background-color: var(--color-border-subtle);
+  border-radius: 0.4rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.title {
+  height: 1.85rem;
+  width: 15rem;
+  margin-bottom: 0.3rem;
+}
+
+.description {
+  height: 1rem;
+  width: 22rem;
+  max-width: 100%;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.toolbarControl {
+  height: 2.25rem;
+  border-radius: 0.4rem;
+}
+
+.toolbarControlSearch {
+  flex: 1;
+  min-width: 220px;
+}
+
+.toolbarControlSelect {
+  width: 140px;
+}
+
+.summary {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.summaryLabel {
+  height: 0.75rem;
+  width: 4rem;
+}
+
+.summaryValue {
+  height: 1.25rem;
+  width: 9rem;
+}
+
+.tableCard {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.8rem;
+  padding: 0.5rem 1rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 0;
+}
+
+.row:not(:last-child) {
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.rowCell {
+  height: 0.9rem;
+}
+
+.rowCellRequester {
+  width: 30%;
+}
+
+.rowCellTeam {
+  width: 15%;
+}
+
+.rowCellApi {
+  width: 20%;
+}
+
+.rowCellStatus {
+  width: 15%;
+}
+
+.rowCellDate {
+  width: 12%;
+}
+
+.mobileCards {
+  display: none;
+}
+
+.mobileCard {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.8rem;
+  padding: 1rem;
+}
+
+.mobileCard:not(:last-child) {
+  margin-bottom: 0.9rem;
+}
+
+.mobileCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.mobileCardRequester {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.mobileCardName {
+  height: 0.95rem;
+  width: 60%;
+}
+
+.mobileCardEmail {
+  height: 0.8rem;
+  width: 80%;
+}
+
+.mobileCardStatus {
+  height: 1.4rem;
+  width: 4.5rem;
+  border-radius: 1rem;
+  flex-shrink: 0;
+}
+
+.mobileCardDetails {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.mobileCardDetailRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.mobileCardDetailLabel {
+  height: 0.65rem;
+  width: 3rem;
+}
+
+.mobileCardDetailValue {
+  height: 0.85rem;
+  width: 70%;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+@media (max-width: 899px) {
+  .page {
+    padding-top: 1.75rem;
+  }
+
+  .title {
+    height: 1.45rem;
+    width: 11rem;
+  }
+
+  .tableCard {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .desktopRows {
+    display: none;
+  }
+
+  .mobileCards {
+    display: block;
+  }
+}

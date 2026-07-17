@@ -4,7 +4,6 @@ import styles from "./RequestsTable.module.css";
 
 type RequestsTableProps = {
   requests: readonly AccessRequest[];
-  emptyMessage?: string;
   selectedRequestId?: string | null;
   onSelectRequest?: (id: string) => void;
 };
@@ -25,7 +24,6 @@ function formatSubmittedDate(submittedAt: string): string {
 
 export function RequestsTable({
   requests,
-  emptyMessage = "No access requests found.",
   selectedRequestId,
   onSelectRequest,
 }: RequestsTableProps) {
@@ -54,134 +52,119 @@ export function RequestsTable({
             </tr>
           </thead>
           <tbody>
-            {requests.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={onSelectRequest !== undefined ? 8 : 7}
-                  className={styles.emptyState}
-                >
-                  {emptyMessage}
+            {requests.map((request) => (
+              <tr
+                key={request.id}
+                className={
+                  request.id === selectedRequestId
+                    ? styles.rowSelected
+                    : undefined
+                }
+              >
+                <td>
+                  <div className={styles.requesterBlock}>
+                    <span className={styles.requesterName}>
+                      {request.requesterName}
+                    </span>
+                    <span className={styles.requesterEmail}>
+                      {request.requesterEmail}
+                    </span>
+                  </div>
                 </td>
+                <td>{request.team}</td>
+                <td>{request.apiName}</td>
+                <td className={styles.capitalize}>{request.environment}</td>
+                <td className={styles.capitalize}>{request.accessLevel}</td>
+                <td>
+                  <time dateTime={request.submittedAt}>
+                    {formatSubmittedDate(request.submittedAt)}
+                  </time>
+                </td>
+                <td>
+                  <StatusBadge status={request.status} />
+                </td>
+                {onSelectRequest !== undefined && (
+                  <td className={styles.actionCell}>
+                    <button
+                      type="button"
+                      className={
+                        request.id === selectedRequestId
+                          ? `${styles.viewButton} ${styles.viewButtonActive}`
+                          : styles.viewButton
+                      }
+                      onClick={() => onSelectRequest(request.id)}
+                      aria-label={`View details for ${request.requesterName}`}
+                    >
+                      View
+                    </button>
+                  </td>
+                )}
               </tr>
-            ) : (
-              requests.map((request) => (
-                <tr
-                  key={request.id}
-                  className={
-                    request.id === selectedRequestId
-                      ? styles.rowSelected
-                      : undefined
-                  }
-                >
-                  <td>
-                    <div className={styles.requesterBlock}>
-                      <span className={styles.requesterName}>
-                        {request.requesterName}
-                      </span>
-                      <span className={styles.requesterEmail}>
-                        {request.requesterEmail}
-                      </span>
-                    </div>
-                  </td>
-                  <td>{request.team}</td>
-                  <td>{request.apiName}</td>
-                  <td className={styles.capitalize}>{request.environment}</td>
-                  <td className={styles.capitalize}>{request.accessLevel}</td>
-                  <td>
-                    <time dateTime={request.submittedAt}>
-                      {formatSubmittedDate(request.submittedAt)}
-                    </time>
-                  </td>
-                  <td>
-                    <StatusBadge status={request.status} />
-                  </td>
-                  {onSelectRequest !== undefined && (
-                    <td className={styles.actionCell}>
-                      <button
-                        type="button"
-                        className={
-                          request.id === selectedRequestId
-                            ? `${styles.viewButton} ${styles.viewButtonActive}`
-                            : styles.viewButton
-                        }
-                        onClick={() => onSelectRequest(request.id)}
-                        aria-label={`View details for ${request.requesterName}`}
-                      >
-                        View
-                      </button>
-                    </td>
-                  )}
-                </tr>
-              ))
-            )}
+            ))}
           </tbody>
         </table>
       </div>
 
       <div className={styles.mobileCards} aria-label="Access requests">
-        {requests.length === 0 ? (
-          <p className={styles.mobileEmptyState}>{emptyMessage}</p>
-        ) : (
-          requests.map((request) => (
-            <article
-              key={request.id}
-              className={
-                request.id === selectedRequestId
-                  ? `${styles.mobileCard} ${styles.mobileCardSelected}`
-                  : styles.mobileCard
-              }
-            >
-              <div className={styles.mobileCardHeader}>
-                <div className={styles.requesterBlock}>
-                  <span className={styles.requesterName}>
-                    {request.requesterName}
-                  </span>
-                  <span className={styles.requesterEmail}>
-                    {request.requesterEmail}
-                  </span>
-                </div>
-                <StatusBadge status={request.status} />
+        {requests.map((request) => (
+          <article
+            key={request.id}
+            className={
+              request.id === selectedRequestId
+                ? `${styles.mobileCard} ${styles.mobileCardSelected}`
+                : styles.mobileCard
+            }
+          >
+            <div className={styles.mobileCardHeader}>
+              <div className={styles.requesterBlock}>
+                <span className={styles.requesterName}>
+                  {request.requesterName}
+                </span>
+                <span className={styles.requesterEmail}>
+                  {request.requesterEmail}
+                </span>
               </div>
+              <StatusBadge status={request.status} />
+            </div>
 
-              <dl className={styles.mobileDetails}>
-                <div className={styles.mobileDetailRow}>
-                  <dt>Team</dt>
-                  <dd>{request.team}</dd>
-                </div>
-                <div className={styles.mobileDetailRow}>
-                  <dt>API</dt>
-                  <dd>{request.apiName}</dd>
-                </div>
-                <div className={styles.mobileDetailRow}>
-                  <dt>Environment</dt>
-                  <dd className={styles.capitalize}>{request.environment}</dd>
-                </div>
-                <div className={styles.mobileDetailRow}>
-                  <dt>Access</dt>
-                  <dd className={styles.capitalize}>{request.accessLevel}</dd>
-                </div>
-                <div className={styles.mobileDetailRow}>
-                  <dt>Submitted</dt>
-                  <dd>
-                    <time dateTime={request.submittedAt}>
-                      {formatSubmittedDate(request.submittedAt)}
-                    </time>
-                  </dd>
-                </div>
-              </dl>
-              {onSelectRequest !== undefined && (
-                <button
-                  type="button"
-                  className={styles.mobileViewButton}
-                  onClick={() => onSelectRequest(request.id)}
-                  aria-label={`View details for ${request.requesterName}`}
-                >
-                  View details
-                </button>
-              )}
-            </article>
-          ))
-        )}
+            <dl className={styles.mobileDetails}>
+              <div className={styles.mobileDetailRow}>
+                <dt>Team</dt>
+                <dd>{request.team}</dd>
+              </div>
+              <div className={styles.mobileDetailRow}>
+                <dt>API</dt>
+                <dd>{request.apiName}</dd>
+              </div>
+              <div className={styles.mobileDetailRow}>
+                <dt>Environment</dt>
+                <dd className={styles.capitalize}>{request.environment}</dd>
+              </div>
+              <div className={styles.mobileDetailRow}>
+                <dt>Access</dt>
+                <dd className={styles.capitalize}>{request.accessLevel}</dd>
+              </div>
+              <div className={styles.mobileDetailRow}>
+                <dt>Submitted</dt>
+                <dd>
+                  <time dateTime={request.submittedAt}>
+                    {formatSubmittedDate(request.submittedAt)}
+                  </time>
+                </dd>
+              </div>
+            </dl>
+            {onSelectRequest !== undefined && (
+              <button
+                type="button"
+                className={styles.mobileViewButton}
+                onClick={() => onSelectRequest(request.id)}
+                aria-label={`View details for ${request.requesterName}`}
+              >
+                View details
+              </button>
+            )}
+          </article>
+        ))}
       </div>
     </>
   );
