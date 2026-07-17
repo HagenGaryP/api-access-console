@@ -170,16 +170,27 @@
   filter: brightness(0.95);
 }
 
-.successMessage {
-  margin-top: 0.65rem;
+.feedbackMessage {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.4rem;
+  border: 1px solid transparent;
   font-size: 0.85rem;
-  color: var(--color-badge-approved-text);
 }
 
-.errorMessage {
-  margin-top: 0.65rem;
-  font-size: 0.85rem;
+.feedbackSuccess {
+  background-color: var(--color-badge-approved-bg);
+  color: var(--color-badge-approved-text);
+  border-color: var(--color-badge-approved-text);
+}
+
+.feedbackError {
+  background-color: var(--color-badge-rejected-bg);
   color: var(--color-badge-rejected-text);
+  border-color: var(--color-badge-rejected-text);
 }
 
 /* Narrow/mobile: full-screen overlay */

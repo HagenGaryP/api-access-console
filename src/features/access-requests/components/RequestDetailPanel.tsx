@@ -81,7 +81,9 @@ export function RequestDetailPanel({
   const isSubmitting = actionState.status === "submitting";
 
   async function handleDecisionClick(action: DecisionAction) {
-    if (request === null) return;
+    // Guard against duplicate submissions: the buttons are disabled while
+    // submitting, but this keeps the handler itself safe regardless.
+    if (request === null || isSubmitting) return;
     setActionState({ status: "submitting", action });
     const result = await submitDecision(request.id, action);
     if (result.ok) {
@@ -223,7 +225,10 @@ export function RequestDetailPanel({
                   className={`${styles.actionButton} ${styles.approveButton}`}
                   onClick={() => handleDecisionClick("approve")}
                   disabled={isSubmitting}
-                  aria-label="Approve request"
+                  aria-busy={
+                    actionState.status === "submitting" &&
+                    actionState.action === "approve"
+                  }
                 >
                   {actionState.status === "submitting" && actionState.action === "approve"
                     ? DECISION_PENDING_LABELS.approve
@@ -234,7 +239,10 @@ export function RequestDetailPanel({
                   className={`${styles.actionButton} ${styles.rejectButton}`}
                   onClick={() => handleDecisionClick("reject")}
                   disabled={isSubmitting}
-                  aria-label="Reject request"
+                  aria-busy={
+                    actionState.status === "submitting" &&
+                    actionState.action === "reject"
+                  }
                 >
                   {actionState.status === "submitting" && actionState.action === "reject"
                     ? DECISION_PENDING_LABELS.reject
@@ -244,15 +252,24 @@ export function RequestDetailPanel({
             )}
 
             {actionState.status === "success" && (
-              <p role="status" className={styles.successMessage}>
-                Request {actionState.action === "approve" ? "approved" : "rejected"}.
-              </p>
+              <div
+                role="status"
+                className={`${styles.feedbackMessage} ${styles.feedbackSuccess}`}
+              >
+                <span>
+                  Request {actionState.action === "approve" ? "approved" : "rejected"}.
+                </span>
+                <StatusBadge status={request.status} />
+              </div>
             )}
 
             {actionState.status === "error" && (
-              <p role="alert" className={styles.errorMessage}>
+              <div
+                role="alert"
+                className={`${styles.feedbackMessage} ${styles.feedbackError}`}
+              >
                 {actionState.message}
-              </p>
+              </div>
             )}
           </section>
         )}
