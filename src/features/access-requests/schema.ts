@@ -72,3 +72,18 @@ export function assertMockDataValid(records: readonly AccessRequest[]): void {
     }
   }
 }
+
+/**
+ * Validates Server Function input for a decision submission. Server
+ * Functions are reachable independent of the UI, so these values must be
+ * treated as untrusted regardless of their declared TypeScript types.
+ */
+export function validateDecisionInput(id: unknown, action: unknown): ValidationResult {
+  const errors: string[] = [];
+
+  if (!isNonEmptyString(id)) errors.push("id must be a non-empty string");
+  if (action !== "approve" && action !== "reject")
+    errors.push('action must be "approve" or "reject"');
+
+  return errors.length === 0 ? { valid: true } : { valid: false, errors };
+}
