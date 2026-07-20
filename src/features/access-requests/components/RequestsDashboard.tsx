@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import type { AccessRequest, AccessStatus, Environment } from "../types";
 import { RequestsTable } from "./RequestsTable";
 import { RequestsToolbar } from "./RequestsToolbar";
@@ -35,6 +35,17 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
   );
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+
+  // Id of the detail panel landmark, shared with the row buttons that
+  // control it via aria-controls.
+  const panelId = useId();
+
+  // Tracks whichever button opened the detail panel, so focus can return
+  // there when the user explicitly closes it. Falls back to the page
+  // heading if that button no longer exists (e.g. its row was filtered
+  // out while the panel was open).
+  const openerRef = useRef<HTMLButtonElement | null>(null);
+  const fallbackFocusRef = useRef<HTMLHeadingElement>(null);
 
   const trimmedSearch = searchQuery.trim();
   const normalizedSearch = trimmedSearch.toLowerCase();
@@ -76,6 +87,24 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
     setSortOrder("newest");
   }
 
+  function handleSelectRequest(id: string, trigger: HTMLButtonElement) {
+    openerRef.current = trigger;
+    setSelectedRequestId(id);
+  }
+
+  // Explicit close (close button or Escape) — clears the selection and
+  // restores focus. Switching directly between requests goes through
+  // `handleSelectRequest` instead and does not touch focus restoration.
+  function handleCloseRequest() {
+    setSelectedRequestId(null);
+    const opener = openerRef.current;
+    if (opener !== null && document.body.contains(opener)) {
+      opener.focus();
+    } else {
+      fallbackFocusRef.current?.focus();
+    }
+  }
+
   function handleDecision(updatedRequest: AccessRequest) {
     setLocalRequests((prev) =>
       prev.map((r) => (r.id === updatedRequest.id ? updatedRequest : r))
@@ -87,7 +116,9 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
     <>
       <main className={styles.page}>
         <header className={styles.header}>
-          <h1 className={styles.title}>API Access Requests</h1>
+          <h1 ref={fallbackFocusRef} tabIndex={-1} className={styles.title}>
+            API Access Requests
+          </h1>
           <p className={styles.description}>
             Review current requests across teams and environments.
           </p>
@@ -159,7 +190,8 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
             <RequestsTable
               requests={filteredRequests}
               selectedRequestId={selectedRequestId}
-              onSelectRequest={setSelectedRequestId}
+              onSelectRequest={handleSelectRequest}
+              panelId={panelId}
             />
           </section>
         )}
@@ -168,8 +200,9 @@ export function RequestsDashboard({ requests }: RequestsDashboardProps) {
       <RequestDetailPanel
         key={selectedRequestId ?? "no-selection"}
         request={selectedRequest}
-        onClose={() => setSelectedRequestId(null)}
+        onClose={handleCloseRequest}
         onDecision={handleDecision}
+        panelId={panelId}
       />
     </>
   );

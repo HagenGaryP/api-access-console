@@ -5,7 +5,9 @@ import styles from "./RequestsTable.module.css";
 type RequestsTableProps = {
   requests: readonly AccessRequest[];
   selectedRequestId?: string | null;
-  onSelectRequest?: (id: string) => void;
+  onSelectRequest?: (id: string, trigger: HTMLButtonElement) => void;
+  /** Id of the currently rendered detail panel, for aria-controls on the selected row's button. */
+  panelId?: string;
 };
 
 const submittedDateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -26,6 +28,7 @@ export function RequestsTable({
   requests,
   selectedRequestId,
   onSelectRequest,
+  panelId,
 }: RequestsTableProps) {
   return (
     <>
@@ -92,8 +95,14 @@ export function RequestsTable({
                           ? `${styles.viewButton} ${styles.viewButtonActive}`
                           : styles.viewButton
                       }
-                      onClick={() => onSelectRequest(request.id)}
+                      onClick={(event) =>
+                        onSelectRequest(request.id, event.currentTarget)
+                      }
                       aria-label={`View details for ${request.requesterName}`}
+                      aria-expanded={request.id === selectedRequestId}
+                      aria-controls={
+                        request.id === selectedRequestId ? panelId : undefined
+                      }
                     >
                       View
                     </button>
@@ -157,8 +166,14 @@ export function RequestsTable({
               <button
                 type="button"
                 className={styles.mobileViewButton}
-                onClick={() => onSelectRequest(request.id)}
+                onClick={(event) =>
+                  onSelectRequest(request.id, event.currentTarget)
+                }
                 aria-label={`View details for ${request.requesterName}`}
+                aria-expanded={request.id === selectedRequestId}
+                aria-controls={
+                  request.id === selectedRequestId ? panelId : undefined
+                }
               >
                 View details
               </button>

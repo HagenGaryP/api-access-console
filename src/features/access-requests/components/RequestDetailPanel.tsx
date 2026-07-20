@@ -10,6 +10,8 @@ type RequestDetailPanelProps = {
   request: AccessRequest | null;
   onClose: () => void;
   onDecision: (updatedRequest: AccessRequest) => void;
+  /** Id applied to the panel landmark; referenced by trigger buttons via aria-controls. */
+  panelId: string;
 };
 
 type ActionState =
@@ -48,17 +50,19 @@ export function RequestDetailPanel({
   request,
   onClose,
   onDecision,
+  panelId,
 }: RequestDetailPanelProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [actionState, setActionState] = useState<ActionState>({ status: "idle" });
 
   const requestId = request?.id ?? null;
 
-  // Focus the close button whenever a new request is opened.
+  // Focus the close button whenever a new request is opened or changes.
+  // Focus restoration to the opener happens in the parent, only when the
+  // user explicitly closes the panel (see RequestsDashboard).
   useEffect(() => {
-    if (requestId !== null) {
-      closeButtonRef.current?.focus();
-    }
+    if (requestId === null) return;
+    closeButtonRef.current?.focus();
   }, [requestId]);
 
   // Close on Escape while the panel is open.
@@ -95,7 +99,11 @@ export function RequestDetailPanel({
 
 
   return (
-    <aside className={styles.panel} aria-labelledby="detail-panel-title">
+    <aside
+      id={panelId}
+      className={styles.panel}
+      aria-labelledby="detail-panel-title"
+    >
       <div className={styles.panelHeader}>
         <h2 id="detail-panel-title" className={styles.panelTitle}>
           {request.requesterName}
