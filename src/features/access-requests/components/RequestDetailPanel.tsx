@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { AccessRequest } from "../types";
-import type { DecisionAction } from "../mock-data";
-import { submitDecision } from "../mock-data";
+import type { AccessRequest, DecisionAction } from "../types";
+import { submitDecision } from "../actions";
 import { StatusBadge } from "./StatusBadge";
 import styles from "./RequestDetailPanel.module.css";
 

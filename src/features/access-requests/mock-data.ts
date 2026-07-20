@@ -1,5 +1,4 @@
 import type { AccessRequest } from "./types";
-import { AccessStatus } from "./types";
 import { assertMockDataValid } from "./schema";
 
 const SIMULATED_LATENCY_MS = 400;
@@ -11,14 +10,10 @@ export function setSimulateError(value: boolean): void {
   simulateError = value;
 }
 
-/** Mock reviewer identity used for all decisions made in this app. */
-const MOCK_REVIEWER_EMAIL = "reviewer@company.com";
-
-export type DecisionAction = "approve" | "reject";
-
-export type SubmitDecisionResult =
-  | { ok: true; request: AccessRequest }
-  | { ok: false; error: string };
+/** Sync getter paired with `setSimulateError`, for server-side callers. */
+export function isSimulatedErrorEnabled(): boolean {
+  return simulateError;
+}
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -212,43 +207,10 @@ export async function fetchAccessRequestById(
 }
 
 /**
- * Simulates approving or rejecting a request. Does not mutate the
- * module-level mock dataset — callers own the resulting record.
+ * Synchronous lookup for server-side callers (e.g. Server Functions) that
+ * already handle their own latency/error simulation. Returns a safe copy.
  */
-export async function submitDecision(
-  id: string,
-  action: DecisionAction,
-): Promise<SubmitDecisionResult> {
-  await sleep(SIMULATED_LATENCY_MS);
-
-  if (simulateError) {
-    return {
-      ok: false,
-      error: `[mock] Failed to submit decision for request ${id}.`,
-    };
-  }
-
+export function findMockAccessRequest(id: string): AccessRequest | undefined {
   const found = mockAccessRequests.find((r) => r.id === id);
-  if (found === undefined) {
-    return { ok: false, error: `[mock] Request ${id} not found.` };
-  }
-
-  if (found.status !== AccessStatus.pending) {
-    return {
-      ok: false,
-      error: `[mock] Only pending requests can be approved or rejected.`,
-    };
-  }
-
-  const updated: AccessRequest = {
-    ...cloneAccessRequest(found),
-    status:
-      action === "approve" ? AccessStatus.approved : AccessStatus.rejected,
-    decision: {
-      reviewedBy: MOCK_REVIEWER_EMAIL,
-      reviewedAt: new Date().toISOString(),
-    },
-  };
-
-  return { ok: true, request: updated };
+  return found ? cloneAccessRequest(found) : undefined;
 }

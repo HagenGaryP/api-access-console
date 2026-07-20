@@ -38,3 +38,9 @@ export type AccessRequest = {
   reviewerNotes?: string;
   decision?: DecisionMetadata;
 };
+
+export type DecisionAction = "approve" | "reject";
+
+export type SubmitDecisionResult =
+  | { ok: true; request: AccessRequest }
+  | { ok: false; error: string };
