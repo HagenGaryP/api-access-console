@@ -24,9 +24,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      # No packageManager/engines field exists yet in package.json, so the
-      # pnpm/Node versions below are pinned to match local development
-      # (pnpm 10.x, Node 22) rather than reusing a repository-defined source.
+      # package.json pins packageManager to pnpm@10.16.1; the major-version
+      # pin below tracks that without needing to bump this file on patch
+      # releases. Node 22 matches local development.
       - name: Install pnpm
         uses: pnpm/action-setup@v6
         with:
