@@ -24,13 +24,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      # package.json pins packageManager to pnpm@10.16.1; the major-version
-      # pin below tracks that without needing to bump this file on patch
-      # releases. Node 22 matches local development.
+      # pnpm version is read from the packageManager field in package.json;
+      # Node.js 22 is pinned directly below to match local development.
       - name: Install pnpm
         uses: pnpm/action-setup@v6
-        with:
-          version: 10
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
