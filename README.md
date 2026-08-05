@@ -63,6 +63,8 @@ Decisions (approve/reject) update state **only in the browser session** that mad
 - Role management
 - Deployment configuration
 
+This reflects what's implemented today. The target architecture and product scope for these deferred items are defined in [docs/PRODUCT_BLUEPRINT.md](docs/PRODUCT_BLUEPRINT.md) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#milestone-3-target-architecture) — none of it is implemented yet.
+
 ## Getting started
 
 Requires [pnpm](https://pnpm.io) (version pinned via the `packageManager` field in [package.json](package.json)).
