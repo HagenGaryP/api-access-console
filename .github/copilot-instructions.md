@@ -14,10 +14,10 @@ Build a polished internal tool for reviewing API access requests.
 ## Constraints
 - Do not add Tailwind
 - Do not add Docker
-- Do not add auth
-- Do not add a database
+- Do not add auth, persistence, or new dependencies opportunistically
+- Auth, persistence, and new dependencies are permitted only when explicitly required by an approved GitHub Issue/task, the documented Milestone 3 architecture/product direction (see `docs/ARCHITECTURE.md` and `docs/PRODUCT_BLUEPRINT.md`), or explicit human instruction — and any such work must stay within that issue/task's scope
+- Do not treat planned Milestone 3 functionality as already implemented; keep current-main, feature-branch, and planned behavior clearly distinguished
 - Do not turn this into a full-stack production system
-- Do not add dependencies unless explicitly requested
 - If replacing a missing dependency would require more than ~10 lines of non-trivial inline code, stop and ask the developer before proceeding
 - Do not implement more than the requested issue or scope
 
